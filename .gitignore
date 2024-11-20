@@ -1,0 +1,36 @@
+# Ignore the Node.js dependencies (for React frontend)
+frontend/node_modules/
+frontend/npm-debug.log
+frontend/package-lock.json
+
+# Ignore the build and cache folders for React
+frontend/build/
+frontend/.cache/
+
+# Ignore the Laravel dependencies
+backend/vendor/
+backend/node_modules/
+backend/.env        
+backend/.env.*      
+backend/public/storage
+backend/storage/*.key
+
+# Ignore compiled files in Laravel
+backend/public/hot
+backend/storage/framework/*
+backend/storage/logs/*
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db
+
+# Ignore IDE configuration files 
+.vscode/
+
+# Ignore all log files
+*.log
+
+# Ignore the npm logs (for both frontend and backend)
+npm-debug.log*

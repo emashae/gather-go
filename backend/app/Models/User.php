@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'role',
         'email',
         'password',
     ];
@@ -45,4 +46,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function events() {
+        return $this->hasMany(Event::class, 'organizer_id');
+    }
+    
+    public function tickets() {
+        return $this->hasMany(Ticket::class, 'attendee_id');
+    }
+    
+    public function feedback() {
+        return $this->hasMany(Feedback::class, 'user_id');
+    }
+    
 }

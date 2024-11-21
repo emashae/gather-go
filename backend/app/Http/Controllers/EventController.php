@@ -3,91 +3,124 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use Illuminate\Http\Request;
+use App\Http\Requests\EventRequest;
+use App\Http\Resources\EventResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Response;
+use Log;
 
 class EventController extends Controller
 {
-    public function __construct()
-    {
-        // Apply authorization checks for specific actions
-        $this->authorizeResource(Event::class, 'event');
-    }
+    use AuthorizesRequests;
 
+    /**
+     * Display a listing of events.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
-        $events = Event::all();
-        return view('events.index', compact('events'));
+        try {
+            Log::info("Fetching events list");
+
+            // Authorize the action
+            $this->authorize('viewAny', Event::class);
+
+            // Fetch events 
+            $events = Event::paginate(10); 
+            return response()->json(EventResource::collection($events), Response::HTTP_OK);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Authorization failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
     }
 
+    /**
+     * Display the specified event.
+     *
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show(Event $event)
     {
-        // Authorization will be handled by the EventPolicy
-        $this->authorize('view', $event);
+        try {
+            $this->authorize('view', $event);
 
-        return view('events.show', compact('event'));
+            return response()->json(new EventResource($event), Response::HTTP_OK);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Authorization failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
     }
 
-    public function create()
+    /**
+     * Store a newly created event in storage.
+     *
+     * @param  \App\Http\Requests\EventRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(EventRequest $request)
     {
-        // Authorization will be handled by the EventPolicy
-        $this->authorize('create', Event::class);
+        try {
+            $this->authorize('create', Event::class);
 
-        return view('events.create');
+            
+            $event = Event::create([
+                'title' => $request->validated()['title'],
+                'description' => $request->validated()['description'],
+                'date' => $request->validated()['date'],
+                'location' => $request->validated()['location'],
+                'organizer_id' => Auth::id(),
+            ]);
+
+            return response()->json(['message' => 'Event created successfully', 'event' => new EventResource($event)], Response::HTTP_CREATED);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Authorization failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
     }
 
-    public function store(Request $request)
+    /**
+     * Update the specified event in storage.
+     *
+     * @param  \App\Http\Requests\EventRequest  $request
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(EventRequest $request, Event $event)
     {
-        $this->authorize('create', Event::class);
+        try {
+            $this->authorize('update', $event);
 
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'required|string',
-        ]);
+            
+            $event->update($request->validated());
 
-        Event::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'date' => $validated['date'],
-            'location' => $validated['location'],
-            'organizer_id' => Auth::id(),
-        ]);
-
-        return redirect()->route('events.index');
+            return response()->json(['message' => 'Event updated successfully', 'event' => new EventResource($event)], Response::HTTP_OK);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Authorization failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
     }
 
-    public function edit(Event $event)
-    {
-        // Authorization will be handled by the EventPolicy
-        $this->authorize('update', $event);
-
-        return view('events.edit', compact('event'));
-    }
-
-    public function update(Request $request, Event $event)
-    {
-        $this->authorize('update', $event);
-
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'required|string',
-        ]);
-
-        $event->update($validated);
-
-        return redirect()->route('events.index');
-    }
-
+    /**
+     * Remove the specified event from storage.
+     *
+     * @param  \App\Models\Event  $event
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Event $event)
     {
-        $this->authorize('delete', $event);
+        try {
+            $this->authorize('delete', $event);
 
-        $event->delete();
+            
+            $event->delete();
 
-        return redirect()->route('events.index');
+            return response()->json(['message' => 'Event deleted successfully'], Response::HTTP_OK);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('Authorization failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
+        }
     }
 }

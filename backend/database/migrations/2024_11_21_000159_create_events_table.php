@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('date'); 
             $table->string('location'); 
             $table->unsignedBigInteger('organizer_id'); 
+            $table->boolean('is_public')->default(false);
             $table->timestamps(); 
 
             // foreign key constraint

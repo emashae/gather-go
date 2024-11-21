@@ -14,7 +14,8 @@ class Event extends Model
         'description', 
         'date', 
         'location', 
-        'organizer_id'
+        'organizer_id',
+        'is_public'
     ];
 
     public function organizer() {

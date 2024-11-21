@@ -1,0 +1,29 @@
+.header {
+  background: linear-gradient(to bottom, rgba(0, 0, 1, 1), rgba(0, 0, 0, 0));
+  padding: 1rem;
+  text-align: center;
+  position: fixed; 
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10; 
+}
+
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+
+.nav-link {
+  color: #9f89d9;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.nav-link.active {
+  color: #FFFFFF;
+  border-bottom: 2px solid #FFFFFF;
+}

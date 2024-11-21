@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\TicketController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -34,4 +35,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('feedback/{feedbackId}', [FeedbackController::class, 'update']);
     Route::delete('feedback/{feedbackId}', [FeedbackController::class, 'destroy']);
 });
+
+//ticket
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('tickets', [TicketController::class, 'index']);
+    Route::post('events/{eventId}/tickets', [TicketController::class, 'store']);
+    Route::get('tickets/{ticketId}', [TicketController::class, 'show']);
+    Route::put('tickets/{ticketId}', [TicketController::class, 'update']);
+    Route::delete('tickets/{ticketId}', [TicketController::class, 'destroy']);
+});
+
 

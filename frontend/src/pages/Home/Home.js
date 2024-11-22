@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 function HomePage() {
+  const navigate = useNavigate();
+
+  const handleGetStartedClick = () => {
+    navigate('/login'); 
+  };
+
   return (
     <div className="hero-section">
       {/* Background Video */}
@@ -17,7 +24,7 @@ function HomePage() {
       <div className="hero-content">
         <h1 className="hero-title">GatherGo</h1>
         <p className="hero-subtitle">Streamline your events, tickets, and attendee engagement.</p>
-        <button className="hero-button">Get Started</button>
+        <button className="hero-button" onClick={handleGetStartedClick}>Get Started</button>
       </div>
     </div>
   );
